@@ -1,8 +1,8 @@
 #ifndef CREDENTIALS_H
 #define CREDENTIALS_H
 
-#define LIVE_SERVER
-//#define TEST_SERVER
+#define TEST_SERVER
+//#define LIVE_SERVER
 
 extern const char* ssid; 
 extern const char* password;
