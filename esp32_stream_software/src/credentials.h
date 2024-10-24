@@ -4,6 +4,9 @@
 #define TEST_SERVER
 //#define LIVE_SERVER
 
+extern const char* aes_key_hex;
+extern const char* aes_iv_hex;
+
 extern const char* ssid; 
 extern const char* password;
 

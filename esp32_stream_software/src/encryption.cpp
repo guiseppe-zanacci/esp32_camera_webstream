@@ -1,5 +1,21 @@
 #include "mbedtls/aes.h"
 #include <string.h>
+#include <stdio.h>
+#include "esp_camera.h"
+
+// Function to convert const char* to const unsigned char*
+const unsigned char* convertCharToUnsignedChar(const char* input) {
+    size_t len = strlen(input);  // Get the length of the input string
+    unsigned char* output = (unsigned char*)malloc(len + 1);  // Allocate memory for unsigned char array (+1 for null terminator)
+
+    // Copy each char into the unsigned char array
+    for (size_t i = 0; i < len; i++) {
+        output[i] = (unsigned char)input[i];
+    }
+
+    output[len] = '\0';  // Null-terminate the new string
+    return output;       // Return as const unsigned char*
+}
 
 void aes_encrypt_cleartext_message(const unsigned char* cleartext_message, size_t cleartext_message_len, unsigned char* encrypted_cleartext_message, const unsigned char* key, const unsigned char* iv) {
     
@@ -38,4 +54,29 @@ void aes_encrypt_cleartext_message(const unsigned char* cleartext_message, size_
     }
 
     mbedtls_aes_free(&aes);  // Free the AES context when done
+}
+
+
+unsigned char* encrypt_frame_buffer(const unsigned char* frame_data, size_t frame_buffer_length, const unsigned char* key, const unsigned char* iv) {
+
+    // Allocate a new buffer for the encrypted data
+    size_t padded_length = ((frame_buffer_length + 15) / 16) * 16;  // Round up to next multiple of 16
+    //unsigned char* encrypted_frame_buffer[padded_length]; // Buffer to hold the encrypted message
+
+    // Allocate a separate buffer to copy frame data for encryption
+    unsigned char* data_to_encrypt = (unsigned char*)malloc(frame_buffer_length);
+
+        // Allocate memory for the encrypted data buffer
+    unsigned char* encrypted_frame_buffer = (unsigned char*)malloc(padded_length);
+
+    // Copy frame data to the new buffer
+    memcpy(data_to_encrypt, frame_data, frame_buffer_length);
+
+    // Call the AES encryption function
+    aes_encrypt_cleartext_message(data_to_encrypt, frame_buffer_length, encrypted_frame_buffer, key, iv);
+
+    // Free the allocated memory
+    free(data_to_encrypt);
+
+    return encrypted_frame_buffer;
 }
